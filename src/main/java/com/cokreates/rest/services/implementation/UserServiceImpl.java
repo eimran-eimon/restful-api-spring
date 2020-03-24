@@ -7,17 +7,23 @@ import com.cokreates.rest.repository.UserRepository;
 import com.cokreates.rest.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 	UserRepository userRepository;
 	Utils utils;
 
-	public UserServiceImpl(UserRepository userRepository, Utils utils) {
+
+	public UserServiceImpl(UserRepository userRepository, Utils utils, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userRepository = userRepository;
 		this.utils = utils;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	@Override
@@ -29,12 +35,17 @@ public class UserServiceImpl implements UserService {
 		}
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(userDTO, userEntity);
-		userEntity.setEncryptedPassword("encryt_password");
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
 		userEntity.setUserId(utils.generateUserId(30));
 		UserEntity storedUserDetails = userRepository.save(userEntity);
 
 		UserDTO returnValue = new UserDTO();
 		BeanUtils.copyProperties(storedUserDetails, returnValue);
 		return returnValue;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+		return null;
 	}
 }
