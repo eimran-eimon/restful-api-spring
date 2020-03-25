@@ -1,8 +1,9 @@
 package com.cokreates.rest.security;
 
-public class SecurityConstants {
+import com.cokreates.rest.SpringApplicationContext;
+import com.cokreates.rest.common.AppProperties;
 
-	public static final String TOKEN_SECRET = "SecretKeyToGenJWTs123456789012345678901234567890:SecretKeyToGenJWTs123456789012345678901234567890:SecretKeyToGenJWTs123456789012345678901234567890";
+public class SecurityConstants {
 
 	public static final long EXPIRATION_TIME = 864000000; // 10 days
 
@@ -11,5 +12,10 @@ public class SecurityConstants {
 	public static final String JWT_HEADER_STRING = "Authorization";
 
 	public static final String SIGN_UP_URL = "/users";
+
+	public static String getSecretToken() {
+		AppProperties appProperties = (AppProperties) SpringApplicationContext.getBean("appProperties");
+		return appProperties.getTokenSecret();
+	}
 
 }

@@ -1,6 +1,10 @@
 package com.cokreates.rest.security;
 
+import com.cokreates.rest.SpringApplicationContext;
+import com.cokreates.rest.common.AppProperties;
+import com.cokreates.rest.common.UserDTO;
 import com.cokreates.rest.model.request.UserLoginRequestModel;
+import com.cokreates.rest.services.UserService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,16 +56,18 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
+		UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
 		String userName = ((User) authResult.getPrincipal()).getUsername();
 
 		// Generate GWT
 		String token = Jwts.builder()
 				.setSubject(userName)
 				.setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
+				.signWith(SignatureAlgorithm.HS512, SecurityConstants.getSecretToken())
 				.compact();
 
+		UserDTO userDTO = userService.getUser(userName);
 		response.addHeader(SecurityConstants.JWT_HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
-
+		response.addHeader("User Id", userDTO.getUserId());
 	}
 }

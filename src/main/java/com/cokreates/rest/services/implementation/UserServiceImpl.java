@@ -5,9 +5,7 @@ import com.cokreates.rest.common.Utils;
 import com.cokreates.rest.model.entity.UserEntity;
 import com.cokreates.rest.repository.UserRepository;
 import com.cokreates.rest.services.UserService;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,10 +29,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDTO createUser(UserDTO userDTO)
-	{
+	public UserDTO createUser(UserDTO userDTO) {
 		UserEntity isExists = userRepository.findByEmail(userDTO.getEmail());
-		if(isExists!=null){
+		if (isExists != null) {
 			throw new RuntimeException("Record already exists!");
 		}
 		UserEntity userEntity = new UserEntity();
@@ -49,9 +46,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public UserDTO getUser(String email) {
+		UserEntity userEntity = userRepository.findByEmail(email);
+		if (userEntity == null) throw new UsernameNotFoundException(email);
+		UserDTO returnValue = new UserDTO();
+		BeanUtils.copyProperties(userEntity, returnValue);
+		return returnValue;
+	}
+
+	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		UserEntity userEntity = userRepository.findByEmail(email);
-		if(userEntity == null) throw new UsernameNotFoundException(email);
+		if (userEntity == null) throw new UsernameNotFoundException(email);
 		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
 }
