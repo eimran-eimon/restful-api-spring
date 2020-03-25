@@ -6,10 +6,7 @@ import com.cokreates.rest.model.request.UserDetailsRequestModel;
 import com.cokreates.rest.model.response.UserRest;
 import com.cokreates.rest.services.UserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -33,6 +30,11 @@ public class UserController {
 		BeanUtils.copyProperties(createdUser, userRest);
 
 		return userRest;
+	}
+
+	@GetMapping
+	public String getUser(){
+		return "Get User api is called!";
 	}
 
 

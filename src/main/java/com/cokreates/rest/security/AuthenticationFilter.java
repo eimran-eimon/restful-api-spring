@@ -1,7 +1,6 @@
 package com.cokreates.rest.security;
 
 import com.cokreates.rest.SpringApplicationContext;
-import com.cokreates.rest.common.AppProperties;
 import com.cokreates.rest.common.UserDTO;
 import com.cokreates.rest.model.request.UserLoginRequestModel;
 import com.cokreates.rest.services.UserService;
