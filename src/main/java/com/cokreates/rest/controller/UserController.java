@@ -32,9 +32,12 @@ public class UserController {
 		return userRest;
 	}
 
-	@GetMapping
-	public String getUser(){
-		return "Get User api is called!";
+	@GetMapping(path = "/{id}")
+	public UserRest getUser(@PathVariable String id){
+		UserRest userRest = new UserRest();
+		UserDTO userDTO = userService.getUserByUserId(id);
+		BeanUtils.copyProperties(userDTO,userRest);
+		return userRest;
 	}
 
 
