@@ -1,9 +1,12 @@
 package com.cokreates.rest.controller;
 
 
+import com.cokreates.rest.common.RequestOperationName;
+import com.cokreates.rest.common.RequestOperationStatus;
 import com.cokreates.rest.common.UserDTO;
-import com.cokreates.rest.exception.UserServiceException;
+import com.cokreates.rest.common.exception.UserServiceException;
 import com.cokreates.rest.model.request.UserDetailsRequestModel;
+import com.cokreates.rest.model.response.OperationStatusModel;
 import com.cokreates.rest.model.response.UserRest;
 import com.cokreates.rest.model.response.exception.ErrorMessages;
 import com.cokreates.rest.services.UserService;
@@ -83,6 +86,23 @@ public class UserController {
 		BeanUtils.copyProperties(updateUser, userRest);
 
 		return userRest;
+	}
+
+	@DeleteMapping(
+			path = "/{id}",
+			produces = {
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE
+			}
+	)
+
+	public OperationStatusModel deleteUser(@PathVariable String id) {
+
+		OperationStatusModel statusModel = new OperationStatusModel();
+		userService.deleteUser(id);
+		statusModel.setOperationName(RequestOperationName.DELETE.name());
+		statusModel.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return statusModel;
 	}
 
 

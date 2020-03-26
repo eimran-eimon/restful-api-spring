@@ -1,4 +1,4 @@
-package com.cokreates.rest.exception;
+package com.cokreates.rest.common.exception;
 
 import com.cokreates.rest.model.response.exception.ErrorMessage;
 import org.springframework.http.HttpHeaders;

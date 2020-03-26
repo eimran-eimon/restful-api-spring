@@ -2,7 +2,7 @@ package com.cokreates.rest.services.implementation;
 
 import com.cokreates.rest.common.UserDTO;
 import com.cokreates.rest.common.Utils;
-import com.cokreates.rest.exception.UserServiceException;
+import com.cokreates.rest.common.exception.UserServiceException;
 import com.cokreates.rest.model.entity.UserEntity;
 import com.cokreates.rest.model.response.exception.ErrorMessages;
 import com.cokreates.rest.repository.UserRepository;
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO getUserByUserId(String id) {
 		UserEntity userEntity = userRepository.findByUserId(id);
-		if (userEntity == null) throw new UsernameNotFoundException(id);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() +" userID: "+ id);
 		UserDTO returnValue = new UserDTO();
 		BeanUtils.copyProperties(userEntity, returnValue);
 		return returnValue;
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO updateUser(UserDTO userDTO, String id) {
 		UserEntity userEntity = userRepository.findByUserId(id);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() +" userID: "+ id);
 		if (!userDTO.getFirstName().isEmpty() && !userDTO.getLastName().isEmpty()) {
 			userEntity.setFirstName(userDTO.getFirstName());
 			userEntity.setLastName(userDTO.getLastName());
@@ -78,6 +78,13 @@ public class UserServiceImpl implements UserService {
 		UserEntity updatedUserDetails = userRepository.save(userEntity);
 		BeanUtils.copyProperties(updatedUserDetails, userDTO);
 		return userDTO;
+	}
+
+	@Override
+	public void deleteUser(String id) {
+		UserEntity userEntity = userRepository.findByUserId(id);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() +" userID: "+ id);
+		userRepository.delete(userEntity);
 	}
 
 	@Override

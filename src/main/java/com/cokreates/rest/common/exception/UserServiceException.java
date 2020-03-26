@@ -1,4 +1,4 @@
-package com.cokreates.rest.exception;
+package com.cokreates.rest.common.exception;
 
 public class UserServiceException extends RuntimeException {
 
