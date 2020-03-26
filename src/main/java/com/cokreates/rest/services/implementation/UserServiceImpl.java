@@ -1,5 +1,6 @@
 package com.cokreates.rest.services.implementation;
 
+import com.cokreates.rest.common.AddressDTO;
 import com.cokreates.rest.common.UserDTO;
 import com.cokreates.rest.common.Utils;
 import com.cokreates.rest.common.exception.UserServiceException;
@@ -7,6 +8,7 @@ import com.cokreates.rest.model.entity.UserEntity;
 import com.cokreates.rest.model.response.exception.ErrorMessages;
 import com.cokreates.rest.repository.UserRepository;
 import com.cokreates.rest.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,14 +42,21 @@ public class UserServiceImpl implements UserService {
 		if (isExists != null) {
 			throw new UserServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 		}
-		UserEntity userEntity = new UserEntity();
-		BeanUtils.copyProperties(userDTO, userEntity);
+
+		for(AddressDTO address: userDTO.getAddresses()){
+			address.setAddressesId(utils.generateAddressId(30));
+			address.setUserDetails(userDTO);
+		}
+		
+		ModelMapper modelMapper = new ModelMapper();
+		UserEntity userEntity = modelMapper.map(userDTO, UserEntity.class);
+
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
 		userEntity.setUserId(utils.generateUserId(30));
-		UserEntity storedUserDetails = userRepository.save(userEntity);
 
-		UserDTO returnValue = new UserDTO();
-		BeanUtils.copyProperties(storedUserDetails, returnValue);
+
+		UserEntity storedUserDetails = userRepository.save(userEntity);
+		UserDTO returnValue = modelMapper.map(storedUserDetails, UserDTO.class);
 		return returnValue;
 	}
 

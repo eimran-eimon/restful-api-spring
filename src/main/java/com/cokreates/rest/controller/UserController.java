@@ -10,6 +10,7 @@ import com.cokreates.rest.model.response.OperationStatusModel;
 import com.cokreates.rest.model.response.UserRest;
 import com.cokreates.rest.model.response.exception.ErrorMessages;
 import com.cokreates.rest.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -39,17 +40,19 @@ public class UserController {
 	)
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
 
-		UserRest userRest = new UserRest();
-
 		if (userDetails.getFirstName().isEmpty())
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
-		UserDTO userDTO = new UserDTO();
-		BeanUtils.copyProperties(userDetails, userDTO);
+		// UserDTO userDTO = new UserDTO();
+		// BeanUtils.copyProperties(userDetails, userDTO);
+
+		ModelMapper modelMapper = new ModelMapper();
+		UserDTO userDTO = modelMapper.map(userDetails, UserDTO.class);
 
 		UserDTO createdUser = userService.createUser(userDTO);
-		BeanUtils.copyProperties(createdUser, userRest);
+		UserRest returnValue = modelMapper.map(createdUser, UserRest.class);
 
-		return userRest;
+
+		return returnValue;
 	}
 
 	@GetMapping(path = "/{id}",
@@ -118,7 +121,7 @@ public class UserController {
 
 		List<UserDTO> users = userService.getUsers(page, limit);
 
-		for (UserDTO userDTO: users){
+		for (UserDTO userDTO : users) {
 			UserRest userRest = new UserRest();
 			BeanUtils.copyProperties(userDTO, userRest);
 			usersList.add(userRest);

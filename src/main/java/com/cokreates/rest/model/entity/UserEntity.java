@@ -1,9 +1,13 @@
 package com.cokreates.rest.model.entity;
 
+import javassist.SerialVersionUID;
+
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 
 @Entity(name = "users")
-public class UserEntity {
+public class UserEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -26,7 +30,16 @@ public class UserEntity {
 	@Column(nullable = false)
 	private Boolean emailVerificationStatus = false;
 
-	private String emailVerificationToken;
+	@OneToMany(mappedBy = "userDetails", cascade = CascadeType.ALL)
+	private List<AddressEntity> addresses;
+
+	public List<AddressEntity> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<AddressEntity> addresses) {
+		this.addresses = addresses;
+	}
 
 	public Long getId() {
 		return id;
@@ -84,11 +97,4 @@ public class UserEntity {
 		this.emailVerificationStatus = emailVerificationStatus;
 	}
 
-	public String getEmailVerificationToken() {
-		return emailVerificationToken;
-	}
-
-	public void setEmailVerificationToken(String emailVerificationToken) {
-		this.emailVerificationToken = emailVerificationToken;
-	}
 }
