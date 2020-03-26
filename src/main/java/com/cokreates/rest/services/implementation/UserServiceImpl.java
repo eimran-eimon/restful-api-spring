@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO getUser(String email) {
 		UserEntity userEntity = userRepository.findByEmail(email);
-		if (userEntity == null) throw new UsernameNotFoundException(email);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		UserDTO returnValue = new UserDTO();
 		BeanUtils.copyProperties(userEntity, returnValue);
 		return returnValue;
@@ -63,6 +63,21 @@ public class UserServiceImpl implements UserService {
 		UserDTO returnValue = new UserDTO();
 		BeanUtils.copyProperties(userEntity, returnValue);
 		return returnValue;
+	}
+
+	@Override
+	public UserDTO updateUser(UserDTO userDTO, String id) {
+		UserEntity userEntity = userRepository.findByUserId(id);
+		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		if (!userDTO.getFirstName().isEmpty() && !userDTO.getLastName().isEmpty()) {
+			userEntity.setFirstName(userDTO.getFirstName());
+			userEntity.setLastName(userDTO.getLastName());
+		} else {
+			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
+		UserEntity updatedUserDetails = userRepository.save(userEntity);
+		BeanUtils.copyProperties(updatedUserDetails, userDTO);
+		return userDTO;
 	}
 
 	@Override

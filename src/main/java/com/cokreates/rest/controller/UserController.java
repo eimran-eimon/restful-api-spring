@@ -57,4 +57,33 @@ public class UserController {
 	}
 
 
+	// update firstName and lastName only.
+	@PutMapping(
+			path = "/{id}",
+			consumes = {
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE
+			},
+			produces = {
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE
+			}
+	)
+
+	public UserRest updateUserDetails(@PathVariable String id,
+	                                  @RequestBody UserDetailsRequestModel userDetails) {
+
+
+		UserRest userRest = new UserRest();
+
+		UserDTO userDTO = new UserDTO();
+		BeanUtils.copyProperties(userDetails, userDTO);
+
+		UserDTO updateUser = userService.updateUser(userDTO, id);
+		BeanUtils.copyProperties(updateUser, userRest);
+
+		return userRest;
+	}
+
+
 }
