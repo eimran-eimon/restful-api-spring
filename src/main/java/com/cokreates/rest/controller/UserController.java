@@ -2,8 +2,10 @@ package com.cokreates.rest.controller;
 
 
 import com.cokreates.rest.common.UserDTO;
+import com.cokreates.rest.exception.UserServiceException;
 import com.cokreates.rest.model.request.UserDetailsRequestModel;
 import com.cokreates.rest.model.response.UserRest;
+import com.cokreates.rest.model.response.exception.ErrorMessages;
 import com.cokreates.rest.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
@@ -29,10 +31,12 @@ public class UserController {
 					MediaType.APPLICATION_JSON_VALUE
 			}
 	)
-	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
+	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
 
 		UserRest userRest = new UserRest();
 
+		if (userDetails.getFirstName().isEmpty())
+			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		UserDTO userDTO = new UserDTO();
 		BeanUtils.copyProperties(userDetails, userDTO);
 
