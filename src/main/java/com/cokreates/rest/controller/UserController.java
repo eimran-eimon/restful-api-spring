@@ -6,6 +6,7 @@ import com.cokreates.rest.model.request.UserDetailsRequestModel;
 import com.cokreates.rest.model.response.UserRest;
 import com.cokreates.rest.services.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,16 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@PostMapping
+	@PostMapping(
+			consumes = {
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE
+			},
+			produces = {
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE
+			}
+	)
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
 
 		UserRest userRest = new UserRest();
@@ -32,11 +42,13 @@ public class UserController {
 		return userRest;
 	}
 
-	@GetMapping(path = "/{id}")
-	public UserRest getUser(@PathVariable String id){
+	@GetMapping(path = "/{id}",
+			produces = {MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE})
+	public UserRest getUser(@PathVariable String id) {
 		UserRest userRest = new UserRest();
 		UserDTO userDTO = userService.getUserByUserId(id);
-		BeanUtils.copyProperties(userDTO,userRest);
+		BeanUtils.copyProperties(userDTO, userRest);
 		return userRest;
 	}
 
