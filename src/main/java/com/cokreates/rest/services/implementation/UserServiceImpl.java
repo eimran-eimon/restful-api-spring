@@ -8,6 +8,9 @@ import com.cokreates.rest.model.response.exception.ErrorMessages;
 import com.cokreates.rest.repository.UserRepository;
 import com.cokreates.rest.services.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,7 +63,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO getUserByUserId(String id) {
 		UserEntity userEntity = userRepository.findByUserId(id);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() +" userID: "+ id);
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + " userID: " + id);
 		UserDTO returnValue = new UserDTO();
 		BeanUtils.copyProperties(userEntity, returnValue);
 		return returnValue;
@@ -68,7 +73,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO updateUser(UserDTO userDTO, String id) {
 		UserEntity userEntity = userRepository.findByUserId(id);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() +" userID: "+ id);
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + " userID: " + id);
 		if (!userDTO.getFirstName().isEmpty() && !userDTO.getLastName().isEmpty()) {
 			userEntity.setFirstName(userDTO.getFirstName());
 			userEntity.setLastName(userDTO.getLastName());
@@ -83,8 +89,27 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void deleteUser(String id) {
 		UserEntity userEntity = userRepository.findByUserId(id);
-		if (userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() +" userID: "+ id);
+		if (userEntity == null)
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage() + " userID: " + id);
 		userRepository.delete(userEntity);
+	}
+
+	@Override
+	public List<UserDTO> getUsers(int page, int limit) {
+
+		List<UserDTO> returnValue = new ArrayList<>();
+
+		Pageable pageableRequest = PageRequest.of(page, limit);
+		Page<UserEntity> usersPage = userRepository.findAll(pageableRequest);
+		List<UserEntity> users = usersPage.getContent();
+
+		for (UserEntity userEntity : users) {
+			UserDTO userDTO = new UserDTO();
+			BeanUtils.copyProperties(userEntity, userDTO);
+			returnValue.add(userDTO);
+		}
+
+		return returnValue;
 	}
 
 	@Override

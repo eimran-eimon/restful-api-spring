@@ -14,6 +14,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -103,6 +106,25 @@ public class UserController {
 		statusModel.setOperationName(RequestOperationName.DELETE.name());
 		statusModel.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return statusModel;
+	}
+
+	@GetMapping(
+			produces = {MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE})
+	public List<UserRest> getAllUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+	                                  @RequestParam(value = "limit", defaultValue = "5") int limit) {
+
+		List<UserRest> usersList = new ArrayList<>();
+
+		List<UserDTO> users = userService.getUsers(page, limit);
+
+		for (UserDTO userDTO: users){
+			UserRest userRest = new UserRest();
+			BeanUtils.copyProperties(userDTO, userRest);
+			usersList.add(userRest);
+		}
+
+		return usersList;
 	}
 
 
