@@ -1,22 +1,19 @@
-package com.cokreates.rest.common;
+package com.cokreates.rest.model.response;
 
-public class AddressDTO {
-
-	private long id;
+public class AddressesRest {
 	private String addressId;
 	private String city;
 	private String country;
 	private String streetName;
 	private String postalCode;
 	private String type;
-	private UserDTO userDetails;
 
-	public long getId() {
-		return id;
+	public String getAddressId() {
+		return addressId;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setAddressId(String addressId) {
+		this.addressId = addressId;
 	}
 
 	public String getCity() {
@@ -59,19 +56,4 @@ public class AddressDTO {
 		this.type = type;
 	}
 
-	public UserDTO getUserDetails() {
-		return userDetails;
-	}
-
-	public void setUserDetails(UserDTO userDetails) {
-		this.userDetails = userDetails;
-	}
-
-	public String getAddressId() {
-		return addressId;
-	}
-
-	public void setAddressId(String addressId) {
-		this.addressId = addressId;
-	}
 }

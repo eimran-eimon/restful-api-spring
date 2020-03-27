@@ -35,7 +35,6 @@ public class UserServiceImpl implements UserService {
 		this.utils = utils;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
-
 	@Override
 	public UserDTO createUser(UserDTO userDTO) {
 		UserEntity isExists = userRepository.findByEmail(userDTO.getEmail());
@@ -44,7 +43,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		for(AddressDTO address: userDTO.getAddresses()){
-			address.setAddressesId(utils.generateAddressId(30));
+			address.setAddressId(utils.generateAddressId(30));
 			address.setUserDetails(userDTO);
 		}
 		
