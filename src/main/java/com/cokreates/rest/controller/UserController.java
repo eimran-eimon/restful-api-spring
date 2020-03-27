@@ -1,20 +1,25 @@
 package com.cokreates.rest.controller;
 
 
+import com.cokreates.rest.common.AddressDTO;
 import com.cokreates.rest.common.RequestOperationName;
 import com.cokreates.rest.common.RequestOperationStatus;
 import com.cokreates.rest.common.UserDTO;
 import com.cokreates.rest.common.exception.UserServiceException;
 import com.cokreates.rest.model.request.UserDetailsRequestModel;
+import com.cokreates.rest.model.response.AddressesRest;
 import com.cokreates.rest.model.response.OperationStatusModel;
 import com.cokreates.rest.model.response.UserRest;
 import com.cokreates.rest.model.response.exception.ErrorMessages;
+import com.cokreates.rest.services.AddressService;
 import com.cokreates.rest.services.UserService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +28,11 @@ import java.util.List;
 public class UserController {
 
 	UserService userService;
+	AddressService addressService;
 
-	public UserController(UserService userService) {
+	public UserController(UserService userService, AddressService addressService) {
 		this.userService = userService;
+		this.addressService = addressService;
 	}
 
 	@PostMapping(
@@ -42,8 +49,6 @@ public class UserController {
 
 		if (userDetails.getFirstName().isEmpty())
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
-		// UserDTO userDTO = new UserDTO();
-		// BeanUtils.copyProperties(userDetails, userDTO);
 
 		ModelMapper modelMapper = new ModelMapper();
 		UserDTO userDTO = modelMapper.map(userDetails, UserDTO.class);
@@ -59,9 +64,8 @@ public class UserController {
 			produces = {MediaType.APPLICATION_XML_VALUE,
 					MediaType.APPLICATION_JSON_VALUE})
 	public UserRest getUser(@PathVariable String id) {
-		UserRest userRest = new UserRest();
 		UserDTO userDTO = userService.getUserByUserId(id);
-		BeanUtils.copyProperties(userDTO, userRest);
+		UserRest userRest = new ModelMapper().map(userDTO, UserRest.class);
 		return userRest;
 	}
 
@@ -87,7 +91,7 @@ public class UserController {
 
 		UserDTO userDTO = new UserDTO();
 		BeanUtils.copyProperties(userDetails, userDTO);
-
+		//TODO: use model mapper
 		UserDTO updateUser = userService.updateUser(userDTO, id);
 		BeanUtils.copyProperties(updateUser, userRest);
 
@@ -122,12 +126,28 @@ public class UserController {
 		List<UserDTO> users = userService.getUsers(page, limit);
 
 		for (UserDTO userDTO : users) {
-			UserRest userRest = new UserRest();
-			BeanUtils.copyProperties(userDTO, userRest);
-			usersList.add(userRest);
+			usersList.add(new ModelMapper().map(userDTO, UserRest.class));
 		}
 
 		return usersList;
+	}
+
+	@GetMapping(path = "/{id}/addresses",
+			produces = {MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE})
+	public List<AddressesRest> getUserAddresses(@PathVariable String id) {
+
+		List<AddressesRest> returnValue = new ArrayList<>();
+
+		List<AddressDTO> addressesDTO = addressService.getAddresses(id);
+		if (addressesDTO != null && !addressesDTO.isEmpty()) {
+			Type listType = new TypeToken<List<AddressesRest>>() {
+			}.getType();
+			ModelMapper modelMapper = new ModelMapper();
+			returnValue = modelMapper.map(addressesDTO, listType);
+		}
+
+		return returnValue;
 	}
 
 
